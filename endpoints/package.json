@@ -1,0 +1,28 @@
+{
+  "name": "@byteplug/endpoints",
+  "version": "0.0.1",
+  "description": "Byteplug toolkit that implements the Endpoints standard.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byteplug/byteplug-node-toolkit.git"
+  },
+  "keywords": [
+    "byteplug",
+    "standards",
+    "endpoints"
+  ],
+  "author": {
+    "name" : "Jonathan De Wachter ",
+    "email" : "jonathan.dewachter@bytpelug.io",
+    "url" : "https://www.bytpelug.io/contact"
+  },
+  "license": "OSL-3.0",
+  "bugs": {
+    "url": "https://github.com/byteplug/byteplug-node-toolkit/issues"
+  },
+  "homepage": "https://www.byteplug.io/"
+}
