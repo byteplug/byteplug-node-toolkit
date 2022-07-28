@@ -3,10 +3,12 @@
   "version": "0.0.1",
   "description": "Byteplug toolkit that implements the Document Validator standard.",
   "main": "src/index.js",
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava tests/*"
   },
   "repository": {
     "type": "git",
@@ -26,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/byteplug/byteplug-node-toolkit/issues"
   },
-  "homepage": "https://www.byteplug.io/"
+  "homepage": "https://www.byteplug.io/",
+  "devDependencies": {
+    "ava": "^4.3.1"
+  }
 }
