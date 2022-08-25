@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Byteplug toolkit that implements the Endpoints standard.",
   "main": "index.js",
+  "files": [
+    "src"
+  ],
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
