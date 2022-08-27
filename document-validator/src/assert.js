@@ -7,15 +7,6 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, July 2022
 
-import validateSpecs from "./specs.js"
-import documentToObject from "./document.js"
-import objectToDocument from "./object.js"
-import { ValidationError, ValidationWarning } from "./exceptions.js"
-
-export {
-    validateSpecs,
-    documentToObject,
-    objectToDocument,
-    ValidationError,
-    ValidationWarning
+export default function assert(condition, message) {
+    if (!condition) throw new Error(message)
 }

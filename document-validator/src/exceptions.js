@@ -7,7 +7,22 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, July 2022
 
-class ValidationError extends Error {}
-class ValidationWarning extends Error {}
+class ValidationError extends Error {
+    constructor(path, message) {
+        super(message)
+
+        this.path = path
+        this.message = message
+    }
+}
+
+class ValidationWarning extends Error {
+    constructor(path, message) {
+        super(message)
+
+        this.path = path
+        this.message = message
+    }
+}
 
 export { ValidationError, ValidationWarning }
