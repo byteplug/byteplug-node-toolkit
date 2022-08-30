@@ -7,6 +7,13 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, August 2022
 
-export default function endpoints(object) {
+/**
+ * To be written.
+ *
+ * @memberof Endpoints
+ */
+function endpoints() {
     console.log("endpoints")
 }
+
+export default endpoints

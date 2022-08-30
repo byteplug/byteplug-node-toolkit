@@ -7,6 +7,14 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, August 2022
 
+/** The @byteplug/endpoints namespace.
+ *
+ * @namespace Endpoints
+ * @version 0.0.1
+ * @author Jonathan De Wachter
+ * @copyright 2022
+ */
+
 import endpoints from "./endpoints.js"
 import { EndpointError } from "./exceptions.js"
 

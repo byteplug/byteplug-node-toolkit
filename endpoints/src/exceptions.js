@@ -7,6 +7,10 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, August 2022
 
+/**
+ * The EndpointError exception class.
+ * @memberof Endpoints
+ */
 class EndpointError extends Error {}
 
 export { EndpointError }

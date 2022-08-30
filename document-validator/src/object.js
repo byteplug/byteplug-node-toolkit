@@ -276,6 +276,15 @@ function adjustNode(path, node, specs, errors, warnings) {
     return processors[specs.type](path, node, specs, errors, warnings)
 }
 
+/**
+ * To be written.
+ * @memberof Document
+ * @param {object} object - To be written.
+ * @param {object} specs - To be written.
+ * @param {array} errors - To be written.
+ * @param {array} warnings - To be written.
+ * @returns {object} - To be written.
+ */
 function objectToDocument(object, specs, errors, warnings) {
     // If errors and warnings parameters are set, they must be empty array.
     assert(

@@ -395,6 +395,15 @@ function validateBlock(path, block, errors, warnings) {
 - specs  must be in the object form, use a yaml lib to read the raw string
 
 */
+
+/**
+ * To be written.
+ *
+ * @memberof Document
+ * @param {object} specs - To be written.
+ * @param {array} errors - To be written.
+ * @param {array} warnings - To be written.
+ */
 function validateSpecs(specs, errors, warnings) {
     // If errors and warnings parameters are set, they must be empty array.
     assert(

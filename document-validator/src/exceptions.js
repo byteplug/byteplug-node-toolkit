@@ -7,6 +7,10 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, July 2022
 
+/**
+ * The ValidationError exception class.
+ * @memberof Document
+ */
 class ValidationError extends Error {
     constructor(path, message) {
         super(message)
@@ -15,7 +19,10 @@ class ValidationError extends Error {
         this.message = message
     }
 }
-
+/**
+ * The ValidationWarning exception class.
+ * @memberof Document
+ */
 class ValidationWarning extends Error {
     constructor(path, message) {
         super(message)

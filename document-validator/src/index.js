@@ -7,6 +7,14 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, July 2022
 
+/** The @byteplug/document namespace.
+ *
+ * @namespace Document
+ * @version 0.0.1
+ * @author Jonathan De Wachter
+ * @copyright 2022
+ */
+
 import validateSpecs from "./specs.js"
 import documentToObject from "./document.js"
 import objectToDocument from "./object.js"
