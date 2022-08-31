@@ -1,6 +1,6 @@
 {
   "name": "@byteplug/document",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Byteplug toolkit that implements the Document Validator standard.",
   "main": "src/index.js",
   "files": [
