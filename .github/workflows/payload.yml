@@ -1,4 +1,4 @@
-name: Document Validator
+name: Payload
 
 on:
   push:
@@ -22,11 +22,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: document-validator/package-lock.json
+        cache-dependency-path: payload/package-lock.json
     - run: |
-        cd document-validator/
+        cd payload/
         npm ci
     - name: Run the unit tests
       run: |
-        cd document-validator/
+        cd payload/
         npm test

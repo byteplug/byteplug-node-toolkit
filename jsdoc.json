@@ -3,7 +3,7 @@
     "recurseDepth": 10,
     "source": {
         "include": [
-            "document-validator/src",
+            "payload/src",
             "endpoints/src"
         ],
         "includePattern": ".+\\.js(doc|x)?$",

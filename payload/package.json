@@ -1,7 +1,7 @@
 {
   "name": "@byteplug/payload",
   "version": "0.0.2",
-  "description": "Byteplug toolkit that implements the Document Validator standard.",
+  "description": "Byteplug toolkit that implements the Payload standard.",
   "main": "src/index.js",
   "files": [
     "src"
@@ -17,7 +17,7 @@
   "keywords": [
     "byteplug",
     "standards",
-    "document-validator"
+    "payload"
   ],
   "author": {
     "name" : "Jonathan De Wachter ",
