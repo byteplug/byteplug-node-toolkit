@@ -278,14 +278,14 @@ function adjustNode(path, node, format, errors, warnings) {
 
 /**
  * To be written.
- * @memberof Document
+ * @memberof Payload
  * @param {object} object - To be written.
  * @param {object} format - To be written.
  * @param {array} errors - To be written.
  * @param {array} warnings - To be written.
  * @returns {object} - To be written.
  */
-function objectToDocument(object, format, errors, warnings) {
+function objectToPayload(object, format, errors, warnings) {
     // If errors and warnings parameters are set, they must be empty array.
     assert(
         errors === undefined || (errors.constructor === Array && errors.length == 0),
@@ -310,8 +310,8 @@ function objectToDocument(object, format, errors, warnings) {
         warnings = []
     }
 
-    const document = adjustNode([], object, format, errors, warnings)
-    const dumpedDocument = JSON.stringify(document)
+    const payload = adjustNode([], object, format, errors, warnings)
+    const dumpedPayload = JSON.stringify(payload)
 
     // If we're not lazy-validating, we raise the first error that occurred, if
     // any.
@@ -319,7 +319,7 @@ function objectToDocument(object, format, errors, warnings) {
         throw errors[0]
     }
 
-    return dumpedDocument
+    return dumpedPayload
 }
 
-export default objectToDocument
+export default objectToPayload

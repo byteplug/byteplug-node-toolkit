@@ -9,7 +9,7 @@
 
 /**
  * The ValidationError exception class.
- * @memberof Document
+ * @memberof Payload
  */
 class ValidationError extends Error {
     constructor(path, message) {
@@ -21,7 +21,7 @@ class ValidationError extends Error {
 }
 /**
  * The ValidationWarning exception class.
- * @memberof Document
+ * @memberof Payload
  */
 class ValidationWarning extends Error {
     constructor(path, message) {

@@ -399,7 +399,7 @@ function validateBlock(path, block, errors, warnings) {
 /**
  * To be written.
  *
- * @memberof Document
+ * @memberof Payload
  * @param {object} format - To be written.
  * @param {array} errors - To be written.
  * @param {array} warnings - To be written.

@@ -8,7 +8,7 @@
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, August 2022
 
 import test from 'ava'
-import { objectToDocument, ValidationError } from '../src/index.js'
+import { objectToPayload, ValidationError } from '../src/index.js'
 
 const VALID_NAMES = [
     "foobar",
@@ -31,18 +31,18 @@ test('flag-type', t => {
 
 	for (const value in [42, 42.5, "Hello world!", [], {}]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
 		t.is(error.message, "was expecting a boolean")
 	}
 
-	var document = objectToDocument(false, format)
-	t.is(document, 'false')
+	var payload = objectToPayload(false, format)
+	t.is(payload, 'false')
 
-	var document = objectToDocument(true, format)
-	t.is(document, 'true')
+	var payload = objectToPayload(true, format)
+	t.is(payload, 'true')
 })
 
 test('number-type', t => {
@@ -50,22 +50,22 @@ test('number-type', t => {
 
 	for (const value of [false, true, "Hello world!", [], {}]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
 		t.is(error.message, "was expecting a number")
 	}
 
-	var document = objectToDocument(42, format)
-	t.is(document, "42")
+	var payload = objectToPayload(42, format)
+	t.is(payload, "42")
 
-	var document = objectToDocument(42.5, format)
-	t.is(document, "42.5")
+	var payload = objectToPayload(42.5, format)
+	t.is(payload, "42.5")
 
 	// test if value is being checked against decimal restriction
 	var error = t.throws(() => {
-		objectToDocument(42.5, { ...format, decimal: false })
+		objectToPayload(42.5, { ...format, decimal: false })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -77,9 +77,9 @@ test('number-type', t => {
 		minimum: 42
 	}
 
-	objectToDocument(42, format)
+	objectToPayload(42, format)
 	var error = t.throws(() => {
-		objectToDocument(41, format)
+		objectToPayload(41, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -93,9 +93,9 @@ test('number-type', t => {
 		}
 	}
 
-	objectToDocument(42, format)
+	objectToPayload(42, format)
 	var error = t.throws(() => {
-		objectToDocument(41, format)
+		objectToPayload(41, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -109,9 +109,9 @@ test('number-type', t => {
 		}
 	}
 
-	objectToDocument(43, format)
+	objectToPayload(43, format)
 	var error = t.throws(() => {
-		objectToDocument(42, format)
+		objectToPayload(42, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -123,9 +123,9 @@ test('number-type', t => {
 		maximum: 42
 	}
 
-	objectToDocument(42, format)
+	objectToPayload(42, format)
 	var error = t.throws(() => {
-		objectToDocument(43, format)
+		objectToPayload(43, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -139,9 +139,9 @@ test('number-type', t => {
 		}
 	}
 
-	objectToDocument(42, format)
+	objectToPayload(42, format)
 	var error = t.throws(() => {
-		objectToDocument(43, format)
+		objectToPayload(43, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -155,9 +155,9 @@ test('number-type', t => {
 		}
 	}
 
-	objectToDocument(41, format)
+	objectToPayload(41, format)
 	var error = t.throws(() => {
-		objectToDocument(42, format)
+		objectToPayload(42, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -171,7 +171,7 @@ test('number-type', t => {
 	}
 
 	var errors = []
-	objectToDocument(42, format, errors)
+	objectToPayload(42, format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "value must be equal or greater than 43")
@@ -185,15 +185,15 @@ test('string-type', t => {
 
 	for (const value of [false, true, 42, 42.5, [], {}]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
 		t.is(error.message, "was expecting a string")
 	}
 
-	var document = objectToDocument("Hello world!", format)
-	t.is(document, '"Hello world!"')
+	var payload = objectToPayload("Hello world!", format)
+	t.is(payload, '"Hello world!"')
 
 	// test if value is being checked against length value
 	var format = {
@@ -202,11 +202,11 @@ test('string-type', t => {
 	}
 
 	var value = 'a'.repeat(42)
-	objectToDocument(value, format)
+	objectToPayload(value, format)
 
 	var error = t.throws(() => {
 		var value = 'a'.repeat(43)
-		objectToDocument(value, format)
+		objectToPayload(value, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -214,7 +214,7 @@ test('string-type', t => {
 
 	var error = t.throws(() => {
 		var value = 'a'.repeat(41)
-		objectToDocument(value, format)
+		objectToPayload(value, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -228,11 +228,11 @@ test('string-type', t => {
 	}
 
 	var value = 'a'.repeat(42)
-	objectToDocument(value, format)
+	objectToPayload(value, format)
 
 	var error = t.throws(() => {
 		var value = 'a'.repeat(41)
-		objectToDocument(value, format)
+		objectToPayload(value, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -246,11 +246,11 @@ test('string-type', t => {
 	}
 
 	var value = 'a'.repeat(42)
-	objectToDocument(value, format)
+	objectToPayload(value, format)
 
 	var error = t.throws(() => {
 		var value = 'a'.repeat(43)
-		objectToDocument(value, format)
+		objectToPayload(value, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -263,12 +263,12 @@ test('string-type', t => {
 	}
 
 	for (const validValue of ["foobar", "foo-bar"]) {
-		objectToDocument(validValue, format)
+		objectToPayload(validValue, format)
 	}
 
 	for (const invalidValue of ["Foobar", "foo_bar", "-foobar", "barfoo-", "foo--bar"]) {
 		var error = t.throws(() => {
-			objectToDocument(invalidValue, format)
+			objectToPayload(invalidValue, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -286,7 +286,7 @@ test('string-type', t => {
 	var errors = []
 
 	var value = 'a'.repeat(43)
-	objectToDocument(value, format, errors)
+	objectToPayload(value, format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "length must be equal to 42")
@@ -304,7 +304,7 @@ test('array-type', t => {
 
 	for (const value of [false, true, 42, 42.5, "Hello world!", {}]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -312,16 +312,16 @@ test('array-type', t => {
 	}
 
 	var format = { type: 'array', value: { type: 'flag' } }
-	var document = objectToDocument([true, false, true], format)
-	t.deepEqual(document, '[true,false,true]')
+	var payload = objectToPayload([true, false, true], format)
+	t.deepEqual(payload, '[true,false,true]')
 
 	var format = { type: 'array', value: { type: 'number' } }
-	var document = objectToDocument([10, 42, 99.5], format)
-	t.deepEqual(document, '[10,42,99.5]')
+	var payload = objectToPayload([10, 42, 99.5], format)
+	t.deepEqual(payload, '[10,42,99.5]')
 
 	var format = { type: 'array', value: { type: 'string' } }
-	var document = objectToDocument(["foo", "bar", "quz"], format)
-	t.deepEqual(document, '["foo","bar","quz"]')
+	var payload = objectToPayload(["foo", "bar", "quz"], format)
+	t.deepEqual(payload, '["foo","bar","quz"]')
 
 	// test if array items are being checked against length value
 	var format = {
@@ -330,17 +330,17 @@ test('array-type', t => {
 		length: 2
 	}
 
-	objectToDocument(["foo", "bar"], format)
+	objectToPayload(["foo", "bar"], format)
 
 	var error = t.throws(() => {
-		objectToDocument(["foo"], format)
+		objectToPayload(["foo"], format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
 	t.is(error.message, "length must be equal to 2")
 
 	var error = t.throws(() => {
-		objectToDocument(["foo", "bar", "quz"], format)
+		objectToPayload(["foo", "bar", "quz"], format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -353,10 +353,10 @@ test('array-type', t => {
 			minimum: 2
 		}
 	}
-	objectToDocument(["foo", "bar"], format)
+	objectToPayload(["foo", "bar"], format)
 
 	var error = t.throws(() => {
-		objectToDocument(["foo"], format)
+		objectToPayload(["foo"], format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -370,10 +370,10 @@ test('array-type', t => {
 		}
 	}
 
-	objectToDocument(["foo", "bar"], format)
+	objectToPayload(["foo", "bar"], format)
 
 	var error = t.throws(() => {
-		objectToDocument(["foo", "bar", "quz"], format)
+		objectToPayload(["foo", "bar", "quz"], format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -389,7 +389,7 @@ test('array-type', t => {
 		}
 	}
 	var errors = []
-	objectToDocument([true, 42, "Hello world!"], format, errors)
+	objectToPayload([true, 42, "Hello world!"], format, errors)
 
 	t.deepEqual(errors[0].path, ['[0]'])
 	t.is(errors[0].message, "was expecting a number")
@@ -408,7 +408,7 @@ test('object-type', t => {
 
 	for (const value of [false, true, 42, 42.5, "Hello world!", []]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -424,18 +424,18 @@ test('object-type', t => {
 		}
 	}
 
-	var document = objectToDocument({1: "foo", 2: "bar", 3: "quz"}, format)
-	t.deepEqual(document, '{"1":"foo","2":"bar","3":"quz"}')
+	var payload = objectToPayload({1: "foo", 2: "bar", 3: "quz"}, format)
+	t.deepEqual(payload, '{"1":"foo","2":"bar","3":"quz"}')
 
 	var error = t.throws(() => {
-		objectToDocument({1: "foo", 2.5: "bar", 3: "quz"}, format)
+		objectToPayload({1: "foo", 2.5: "bar", 3: "quz"}, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
 	t.is(error.message, "key at index 2 is invalid; expected it to be an integer")
 
 	var error = t.throws(() => {
-		objectToDocument({1: "foo", "bar": "bar", 3: "quz"}, format)
+		objectToPayload({1: "foo", "bar": "bar", 3: "quz"}, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -452,17 +452,17 @@ test('object-type', t => {
 	}
 
 	// for (const name of VALID_NAMES) {
-	// 	var document = objectToDocument({'foo': 10, [name]: 42, 'quz': 100}, format)
-	// 	t.deepEqual(document, `{"foo":10,"${name}":42,"quz":100}`)
+	// 	var payload = objectToPayload({'foo': 10, [name]: 42, 'quz': 100}, format)
+	// 	t.deepEqual(payload, `{"foo":10,"${name}":42,"quz":100}`)
 	// }
 	for (const name of VALID_NAMES) {
-		var document = objectToDocument({[name]: 42, 'foo': 10, 'quz': 100}, format)
-		t.deepEqual(document, `{"${name}":42,"foo":10,"quz":100}`)
+		var payload = objectToPayload({[name]: 42, 'foo': 10, 'quz': 100}, format)
+		t.deepEqual(payload, `{"${name}":42,"foo":10,"quz":100}`)
 	}
 
 	for (const name of INVALID_NAMES) {
 		var error = t.throws(() => {
-			objectToDocument({'foo': 10, [name]: 42, 'quz': 100}, format)
+			objectToPayload({'foo': 10, [name]: 42, 'quz': 100}, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -477,17 +477,17 @@ test('object-type', t => {
 		length: 2
 	}
 
-	objectToDocument({'foo': 1, 'bar': 2}, format)
+	objectToPayload({'foo': 1, 'bar': 2}, format)
 
 	var error = t.throws(() => {
-		objectToDocument({'foo': 1}, format)
+		objectToPayload({'foo': 1}, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
 	t.is(error.message, "length must be equal to 2")
 
 	var error = t.throws(() => {
-		objectToDocument({'foo': 1, 'bar': 2, 'quz': 3}, format)
+		objectToPayload({'foo': 1, 'bar': 2, 'quz': 3}, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -501,10 +501,10 @@ test('object-type', t => {
 			minimum: 2
 		}
 	}
-	objectToDocument({'foo': 1, 'bar': 2}, format)
+	objectToPayload({'foo': 1, 'bar': 2}, format)
 
 	var error = t.throws(() => {
-		objectToDocument({'foo': 1}, format)
+		objectToPayload({'foo': 1}, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -518,10 +518,10 @@ test('object-type', t => {
 			maximum: 2
 		}
 	}
-	objectToDocument({'foo': 1, 'bar': 2}, format)
+	objectToPayload({'foo': 1, 'bar': 2}, format)
 
 	var error = t.throws(() => {
-		objectToDocument({'foo': 1, 'bar': 2, 'quz': 3}, format)
+		objectToPayload({'foo': 1, 'bar': 2, 'quz': 3}, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -537,7 +537,7 @@ test('object-type', t => {
 	}
 
 	var errors = []
-	objectToDocument({'foo': true, 'bar': 42, 'quz': "Hello world!"}, format, errors)
+	objectToPayload({'foo': true, 'bar': 42, 'quz': "Hello world!"}, format, errors)
 
 	t.deepEqual(errors[0].path, ['{foo}'])
 	t.is(errors[0].message, "was expecting a number")
@@ -557,18 +557,18 @@ test('tuple-type', t => {
 
 	for (const value of [false, true, 42, 42.5, "Hello world!", {}]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
 		t.is(error.message, "was expecting an array")
 	}
 
-	var document = objectToDocument([true, 42, "foo"], format)
-	t.deepEqual(document, '[true,42,"foo"]')
+	var payload = objectToPayload([true, 42, "foo"], format)
+	t.deepEqual(payload, '[true,42,"foo"]')
 
 	var error = t.throws(() => {
-		objectToDocument([false, true, 42, "foo"], format)
+		objectToPayload([false, true, 42, "foo"], format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -576,7 +576,7 @@ test('tuple-type', t => {
 
 	// test lazy validation
 	var errors = []
-	objectToDocument(["Hello world!", true, 42], format, errors)
+	objectToPayload(["Hello world!", true, 42], format, errors)
 
 	t.deepEqual(errors[0].path, ['<0>'])
 	t.is(errors[0].message, "was expecting a boolean")
@@ -598,7 +598,7 @@ test('map-type', t => {
 
 	for (const value of [false, true, 42, 42.5, "Hello world!", []]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -610,8 +610,8 @@ test('map-type', t => {
 		bar: 42,
 		quz: "Hello world!"
 	}
-	var document = objectToDocument(value, format)
-	t.deepEqual(document, '{"foo":true,"bar":42,"quz":"Hello world!"}')
+	var payload = objectToPayload(value, format)
+	t.deepEqual(payload, '{"foo":true,"bar":42,"quz":"Hello world!"}')
 
 	// test if unexpected fields are reported
 	var value = {
@@ -621,7 +621,7 @@ test('map-type', t => {
 		yolo: false
 	}
 	var error = t.throws(() => {
-		objectToDocument(value, format)
+		objectToPayload(value, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -633,7 +633,7 @@ test('map-type', t => {
 		bar: 42
 	}
 	var error = t.throws(() => {
-		objectToDocument(value, format)
+		objectToPayload(value, format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -645,12 +645,12 @@ test('map-type', t => {
 		quz: "Hello world!"
 	}
 
-	var document = objectToDocument(value, format)
-	t.deepEqual(document, '{"foo":true,"quz":"Hello world!","bar":null}')
+	var payload = objectToPayload(value, format)
+	t.deepEqual(payload, '{"foo":true,"quz":"Hello world!","bar":null}')
 
 	// test lazy validation
 	var errors = []
-	objectToDocument({"foo": "Hello world!", "bar": true, "quz": 42}, format, errors)
+	objectToPayload({"foo": "Hello world!", "bar": true, "quz": 42}, format, errors)
 
 	t.deepEqual(errors[0].path, ['$foo'])
 	t.is(errors[0].message, "was expecting a boolean")
@@ -668,7 +668,7 @@ test('enum-type', t => {
 
 	for (const value of [false, true, 42, 42.5, [], {}]) {
 		var error = t.throws(() => {
-			objectToDocument(value, format)
+			objectToPayload(value, format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -676,13 +676,13 @@ test('enum-type', t => {
 	}
 
 	for (const value of ['foo', 'bar', 'quz']) {
-		var document = objectToDocument(value, format)
-		t.is(document, `"${value}"`)
+		var payload = objectToPayload(value, format)
+		t.is(payload, `"${value}"`)
 	}
 
 	// test if value is being checked against the valid values
 	var error = t.throws(() => {
-		objectToDocument("Hello world!", format)
+		objectToPayload("Hello world!", format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])

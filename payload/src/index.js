@@ -7,23 +7,23 @@
 //
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, July 2022
 
-/** The @byteplug/document namespace.
+/** The @byteplug/payload namespace.
  *
- * @namespace Document
+ * @namespace Payload
  * @version 0.0.1
  * @author Jonathan De Wachter
  * @copyright 2022
  */
 
 import validateFormat from "./format.js"
-import documentToObject from "./document.js"
-import objectToDocument from "./object.js"
+import payloadToObject from "./payload.js"
+import objectToPayload from "./object.js"
 import { ValidationError, ValidationWarning } from "./exceptions.js"
 
 export {
     validateFormat,
-    documentToObject,
-    objectToDocument,
+    payloadToObject,
+    objectToPayload,
     ValidationError,
     ValidationWarning
 }
