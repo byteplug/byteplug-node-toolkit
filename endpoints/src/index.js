@@ -1,4 +1,4 @@
-// Copyright (c) 2022 - Byteplug Inc.
+// Copyright (c) 2022-2023, Byteplug LLC.
 //
 // This source file is part of the Byteplug toolkit for the JavaScript
 // programming language which is released under the OSL-3.0 license. Please
