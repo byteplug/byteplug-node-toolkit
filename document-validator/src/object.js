@@ -11,7 +11,7 @@ import { ValidationError } from "./exceptions.js"
 import { readMinimumValue, readMaximumValue, checkLength } from "./utility.js"
 import assert from "./assert.js"
 
-function processFlagNode(path, node, specs, errors, warnings) {
+function processFlagNode(path, node, format, errors, warnings) {
     if (typeof node !== 'boolean') {
         const error = new ValidationError(path, "was expecting a boolean")
         errors.push(error)
@@ -21,14 +21,14 @@ function processFlagNode(path, node, specs, errors, warnings) {
     return node
 }
 
-function processNumberNode(path, node, specs, errors, warnings) {
-    var decimal = specs.decimal
+function processNumberNode(path, node, format, errors, warnings) {
+    var decimal = format.decimal
     if (decimal === undefined) {
         decimal = true
     }
 
-    var minimum = readMinimumValue(specs)
-    var maximum = readMaximumValue(specs)
+    var minimum = readMinimumValue(format)
+    var maximum = readMaximumValue(format)
 
     if (typeof node !== 'number') {
         const error = new ValidationError(path, "was expecting a number")
@@ -82,7 +82,7 @@ function processNumberNode(path, node, specs, errors, warnings) {
     return node
 }
 
-function processStringNode(path, node, specs, errors, warnings) {
+function processStringNode(path, node, format, errors, warnings) {
     if (typeof node !== 'string') {
         const error = new ValidationError(path, "was expecting a string")
         errors.push(error)
@@ -91,12 +91,12 @@ function processStringNode(path, node, specs, errors, warnings) {
 
     var nodeErrors = []
 
-    if (specs.length !== undefined) {
-        checkLength(node.length, specs.length, path, errors, warnings)
+    if (format.length !== undefined) {
+        checkLength(node.length, format.length, path, errors, warnings)
     }
 
-    if (specs.pattern !== undefined) {
-        if (!new RegExp(specs.pattern).test(node)) {
+    if (format.pattern !== undefined) {
+        if (!new RegExp(format.pattern).test(node)) {
             const error = new ValidationError(path, "value did not match the pattern")
             errors.push(error)
         }
@@ -110,42 +110,42 @@ function processStringNode(path, node, specs, errors, warnings) {
     return node
 }
 
-function processArrayNode(path, node, specs, errors, warnings) {
+function processArrayNode(path, node, format, errors, warnings) {
     if (node.constructor !== Array) {
         const error = new ValidationError(path, "was expecting an array")
         errors.push(error)
         return
     }
 
-    if (specs.length !== undefined) {
-        checkLength(node.length, specs.length, path, errors, warnings)
+    if (format.length !== undefined) {
+        checkLength(node.length, format.length, path, errors, warnings)
     }
 
     var adjustedNode = []
     node.forEach((item, index) => {
-        var adjustedItem = adjustNode(path.concat(`[${index}]`), item, specs.value, errors, warnings)
+        var adjustedItem = adjustNode(path.concat(`[${index}]`), item, format.value, errors, warnings)
         adjustedNode.push(adjustedItem)
     })
 
     return adjustedNode
 }
 
-function processObjectNode(path, node, specs, errors, warnings) {
+function processObjectNode(path, node, format, errors, warnings) {
     if (node.constructor === Array || typeof node !== 'object') {
         const error = new ValidationError(path, "was expecting an object")
         errors.push(error)
         return
     }
 
-    if (specs.length !== undefined) {
-        checkLength(Object.keys(node).length, specs.length, path, errors, warnings)
+    if (format.length !== undefined) {
+        checkLength(Object.keys(node).length, format.length, path, errors, warnings)
     }
 
     var adjustedNode = {}
     Object.keys(node).forEach((itemKey, index) => {
         var nodeKey
 
-        if (specs.key === 'integer') {
+        if (format.key === 'integer') {
             nodeKey = Number.parseFloat(itemKey)
             // TODO; check for NaN, parseInt() is very tolerant; find a more restrictive sol ?
             if (nodeKey === undefined || nodeKey === NaN || !Number.isInteger(nodeKey)) {
@@ -154,7 +154,7 @@ function processObjectNode(path, node, specs, errors, warnings) {
                 return
             }
         }
-        else if (specs.key === 'string') {
+        else if (format.key === 'string') {
             if (!/^[a-zA-Z0-9\-\_]+$/.test(itemKey)) {
                 const error = new ValidationError(path, `key at index ${index} is invalid; expected to match the pattern`)
                 errors.push(error)
@@ -164,36 +164,36 @@ function processObjectNode(path, node, specs, errors, warnings) {
             nodeKey = itemKey
         }
 
-        var adjustedValue = adjustNode(path.concat(`{${itemKey}}`), node[itemKey], specs.value, errors, warnings)
+        var adjustedValue = adjustNode(path.concat(`{${itemKey}}`), node[itemKey], format.value, errors, warnings)
         adjustedNode[nodeKey] = adjustedValue
     })
 
     return adjustedNode
 }
 
-function processTupleNode(path, node, specs, errors, warnings) {
+function processTupleNode(path, node, format, errors, warnings) {
     if (node.constructor !== Array) {
         const error = new ValidationError(path, "was expecting an array")
         errors.push(error)
         return
     }
 
-    if (node.length != specs.items.length) {
-        const error = new ValidationError(path, `length of the array must be ${specs.items.length}`)
+    if (node.length != format.items.length) {
+        const error = new ValidationError(path, `length of the array must be ${format.items.length}`)
         errors.push(error)
         return
     }
 
     var adjustedNode = []
     node.forEach((item, index) => {
-        var adjustedItem = adjustNode(path.concat(`<${index}>`), item, specs.items[index], errors, warnings)
+        var adjustedItem = adjustNode(path.concat(`<${index}>`), item, format.items[index], errors, warnings)
         adjustedNode.push(adjustedItem)
     })
 
     return adjustedNode
 }
 
-function processMapNode(path, node, specs, errors, warnings) {
+function processMapNode(path, node, format, errors, warnings) {
     if (node.constructor === Array || typeof node !== 'object') {
         const error = new ValidationError(path, "was expecting an object")
         errors.push(error)
@@ -204,8 +204,8 @@ function processMapNode(path, node, specs, errors, warnings) {
 
     var adjustedNode = {}
     for (const [key, value] of Object.entries(node)) {
-        if (key in specs.fields) {
-            adjustedNode[key] = adjustNode(path.concat(`$${key}`), value, specs.fields[key], errors, warnings)
+        if (key in format.fields) {
+            adjustedNode[key] = adjustNode(path.concat(`$${key}`), value, format.fields[key], errors, warnings)
         }
         else {
             const error = new ValidationError(path, `'${key}' field was unexpected`)
@@ -213,12 +213,12 @@ function processMapNode(path, node, specs, errors, warnings) {
         }
     }
 
-    const missingKeys = Object.keys(specs.fields).filter(key => {
+    const missingKeys = Object.keys(format.fields).filter(key => {
         return !(key in adjustedNode)
     })
 
     missingKeys.forEach(key => {
-        if (specs.fields[key].option === undefined || specs.fields[key].option == false) {
+        if (format.fields[key].option === undefined || format.fields[key].option == false) {
             const error = new ValidationError(path, `'${key}' field was missing`)
             errors.push(error)
         }
@@ -237,14 +237,14 @@ function processMapNode(path, node, specs, errors, warnings) {
     return adjustedNode
 }
 
-function processEnumNode(path, node, specs, errors, warnings) {
+function processEnumNode(path, node, format, errors, warnings) {
     if (typeof node !== 'string') {
         const error = new ValidationError(path, "was expecting a string")
         errors.push(error)
         return
     }
 
-    if (!specs.values.includes(node)) {
+    if (!format.values.includes(node)) {
         const error = new ValidationError(path, "enum value is invalid")
         errors.push(error)
         return
@@ -264,28 +264,28 @@ const processors = {
     enum   : processEnumNode,
 }
 
-function adjustNode(path, node, specs, errors, warnings) {
+function adjustNode(path, node, format, errors, warnings) {
     // We accept a null value if the type is marked as optional.
     var optional = false
-    if (specs.option !== undefined)
-        optional = specs.option
+    if (format.option !== undefined)
+        optional = format.option
 
     if (optional && node === null)
         return null
 
-    return processors[specs.type](path, node, specs, errors, warnings)
+    return processors[format.type](path, node, format, errors, warnings)
 }
 
 /**
  * To be written.
  * @memberof Document
  * @param {object} object - To be written.
- * @param {object} specs - To be written.
+ * @param {object} format - To be written.
  * @param {array} errors - To be written.
  * @param {array} warnings - To be written.
  * @returns {object} - To be written.
  */
-function objectToDocument(object, specs, errors, warnings) {
+function objectToDocument(object, format, errors, warnings) {
     // If errors and warnings parameters are set, they must be empty array.
     assert(
         errors === undefined || (errors.constructor === Array && errors.length == 0),
@@ -310,7 +310,7 @@ function objectToDocument(object, specs, errors, warnings) {
         warnings = []
     }
 
-    const document = adjustNode([], object, specs, errors, warnings)
+    const document = adjustNode([], object, format, errors, warnings)
     const dumpedDocument = JSON.stringify(document)
 
     // If we're not lazy-validating, we raise the first error that occurred, if

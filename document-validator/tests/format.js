@@ -8,7 +8,7 @@
 // Written by Jonathan De Wachter <jonathan.dewachter@byteplug.io>, July 2022
 
 import test from 'ava'
-import { validateSpecs, ValidationError } from '../src/index.js'
+import { validateFormat, ValidationError } from '../src/index.js'
 
 const VALID_NAMES = [
     "foobar",
@@ -26,78 +26,78 @@ const INVALID_NAMES = [
 
 ]
 
-function boolValuePropertyTest(t, specs, key, path) {
-	validateSpecs({ ...specs, [key]: true })
-	validateSpecs({ ...specs, [key]: false })
+function boolValuePropertyTest(t, format, key, path) {
+	validateFormat({ ...format, [key]: true })
+	validateFormat({ ...format, [key]: false })
 
 	var error = t.throws(() => {
-		validateSpecs({...specs, [key]: 42})
+		validateFormat({...format, [key]: 42})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, path.concat(key))
 	t.is(error.message, "value must be a bool")
 
 	var error = t.throws(() => {
-		validateSpecs({...specs, [key]: "Hello world!"})
+		validateFormat({...format, [key]: "Hello world!"})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, path.concat(key))
 	t.is(error.message, "value must be a bool")
 }
 
-function numberValuePropertyTest(t, specs, key, path) {
+function numberValuePropertyTest(t, format, key, path) {
 	// To be written.
 }
 
-function stringValuePropertyTest(t, specs, key, path) {
-	validateSpecs({ ...specs, [key]: "Hello world!" })
+function stringValuePropertyTest(t, format, key, path) {
+	validateFormat({ ...format, [key]: "Hello world!" })
 
 	var error = t.throws(() => {
-		validateSpecs({...specs, [key]: false})
+		validateFormat({...format, [key]: false})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, path.concat(key))
 	t.is(error.message, "value must be a string")
 
 	error = t.throws(() => {
-		validateSpecs({...specs, [key]: true})
+		validateFormat({...format, [key]: true})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, path.concat(key))
 	t.is(error.message, "value must be a string")
 
 	error = t.throws(() => {
-		validateSpecs({...specs, [key]: 42})
+		validateFormat({...format, [key]: 42})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, path.concat(key))
 	t.is(error.message, "value must be a string")
 }
 
-function namePropertyTest(t, specs) {
-	stringValuePropertyTest(t, specs, "name", [])
+function namePropertyTest(t, format) {
+	stringValuePropertyTest(t, format, "name", [])
 }
 
-function descriptionPropertyTest(t, specs) {
-	stringValuePropertyTest(t, specs, "description", [])
+function descriptionPropertyTest(t, format) {
+	stringValuePropertyTest(t, format, "description", [])
 }
 
-function optionPropertyTest(t, specs, path) {
-	boolValuePropertyTest(t, specs, "option", path)
+function optionPropertyTest(t, format, path) {
+	boolValuePropertyTest(t, format, "option", path)
 }
 
-function missingPropertyTest(t, specs, property) {
+function missingPropertyTest(t, format, property) {
 	const error = t.throws(() => {
-		validateSpecs(specs)
+		validateFormat(format)
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
 	t.is(error.message, `'${property}' property is missing`)
 }
 
-function additionalPropertiesTest(t, specs) {
+function additionalPropertiesTest(t, format) {
 	var errors = []
-	validateSpecs({ ...specs, foo: 'bar', bar: 'foo' }, errors=errors)
+	validateFormat({ ...format, foo: 'bar', bar: 'foo' }, errors=errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -105,55 +105,55 @@ function additionalPropertiesTest(t, specs) {
 	t.is(errors[1].message, "'bar' property is unexpected")
 }
 
-function lengthPropertyTest(t, specs) {
-	validateSpecs({ ...specs, length: 42 })
+function lengthPropertyTest(t, format) {
+	validateFormat({ ...format, length: 42 })
 
-	validateSpecs({ ...specs, length: { minimum: 42 } })
-	validateSpecs({ ...specs, length: { maximum: 42 } })
-	validateSpecs({ ...specs, length: { minimum: 0, maximum: 42 } })
+	validateFormat({ ...format, length: { minimum: 42 } })
+	validateFormat({ ...format, length: { maximum: 42 } })
+	validateFormat({ ...format, length: { minimum: 0, maximum: 42 } })
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, length: -1 })
+		validateFormat({ ...format, length: -1 })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['length'])
 	t.is(error.message, "must be greater or equal to zero")
 
 	var warnings = []
-	validateSpecs({ ...specs, length: 42.5 }, undefined, warnings)
+	validateFormat({ ...format, length: 42.5 }, undefined, warnings)
 	t.is(warnings.length, 1)
 	t.deepEqual(warnings[0].path, ['length'])
 	t.is(warnings[0].message, "should be an integer (got decimal)")
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, length: { minimum: -1 }})
+		validateFormat({ ...format, length: { minimum: -1 }})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['length', 'minimum'])
 	t.is(error.message, "must be greater or equal to zero")
 
 	var warnings = []
-	validateSpecs({ ...specs, length: { minimum: 42.5 }}, undefined, warnings)
+	validateFormat({ ...format, length: { minimum: 42.5 }}, undefined, warnings)
 	t.is(warnings.length, 1)
 	t.deepEqual(warnings[0].path, ['length', 'minimum'])
 	t.is(warnings[0].message, "should be an integer (got decimal)")
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, length: { maximum: -1 }})
+		validateFormat({ ...format, length: { maximum: -1 }})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['length', 'maximum'])
 	t.is(error.message, "must be greater or equal to zero")
 
 	var warnings = []
-	validateSpecs({ ...specs, length: { maximum: 42.5 }}, undefined, warnings)
+	validateFormat({ ...format, length: { maximum: 42.5 }}, undefined, warnings)
 	t.is(warnings.length, 1)
 	t.deepEqual(warnings[0].path, ['length', 'maximum'])
 	t.is(warnings[0].message, "should be an integer (got decimal)")
 
 	for (const [minimum, maximum] of [[42, 0], [1, 0]]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, length: { minimum, maximum }})
+			validateFormat({ ...format, length: { minimum, maximum }})
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['length'])
@@ -161,7 +161,7 @@ function lengthPropertyTest(t, specs) {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, length: { foo: 'bar' }})
+		validateFormat({ ...format, length: { foo: 'bar' }})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['length'])
@@ -170,9 +170,9 @@ function lengthPropertyTest(t, specs) {
 
 test('type-block', t => {
 	// type blocks must be an object
-	for (const specs in [false, true, 42, 42.5, "Hello world!"]) {
+	for (const format in [false, true, 42, 42.5, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs(specs)
+			validateFormat(format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -184,7 +184,7 @@ test('type-block', t => {
 
 	// value of 'type' property is incorrect
 	var error = t.throws(() => {
-		validateSpecs({ type: 'foo' })
+		validateFormat({ type: 'foo' })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -192,30 +192,30 @@ test('type-block', t => {
 })
 
 test('flag-type', t => {
-	// test minimal specs
-	var specs = { type: 'flag' }
-	validateSpecs(specs)
+	// test minimal format
+	var format = { type: 'flag' }
+	validateFormat(format)
 	t.pass()
 
 	//  test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'flag' ,
         option: 42,
         foo: 'bar'
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -224,21 +224,21 @@ test('flag-type', t => {
 })
 
 test('number-type', t => {
-	// test minimal specs
-	var specs = { type: 'number' }
-	validateSpecs(specs)
+	// test minimal format
+	var format = { type: 'number' }
+	validateFormat(format)
 
 	// test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test 'decimal' property
-	validateSpecs({ ...specs, decimal: false })
-	validateSpecs({ ...specs, decimal: true })
+	validateFormat({ ...format, decimal: false })
+	validateFormat({ ...format, decimal: true })
 
 	for (const invalidValue in [42, 42.5, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, decimal: invalidValue })
+			validateFormat({ ...format, decimal: invalidValue })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['decimal'])
@@ -246,14 +246,14 @@ test('number-type', t => {
 	}
 
 	// test 'minimum' property
-	validateSpecs({ ...specs, minimum: 42 })
-	validateSpecs({ ...specs, minimum: { value: 42 }})
-	validateSpecs({ ...specs, minimum: { exclusive: false, value: 42 }})
-	validateSpecs({ ...specs, minimum: { exclusive: true, value: 42 }})
+	validateFormat({ ...format, minimum: 42 })
+	validateFormat({ ...format, minimum: { value: 42 }})
+	validateFormat({ ...format, minimum: { exclusive: false, value: 42 }})
+	validateFormat({ ...format, minimum: { exclusive: true, value: 42 }})
 
 	for (const invalidValue of [false, true, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, minimum: invalidValue })
+			validateFormat({ ...format, minimum: invalidValue })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['minimum'])
@@ -261,7 +261,7 @@ test('number-type', t => {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, minimum: { exclusive: false}})
+		validateFormat({ ...format, minimum: { exclusive: false}})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['minimum'])
@@ -269,7 +269,7 @@ test('number-type', t => {
 
 	for (const invalidValue of [42, 42.5, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, minimum: { exclusive: invalidValue, value: 42 }})
+			validateFormat({ ...format, minimum: { exclusive: invalidValue, value: 42 }})
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['minimum', 'exclusive'])
@@ -278,7 +278,7 @@ test('number-type', t => {
 
 	for (const invalidValue of [false, true, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, minimum: { exclusive: false, value: invalidValue }})
+			validateFormat({ ...format, minimum: { exclusive: false, value: invalidValue }})
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['minimum', 'value'])
@@ -286,21 +286,21 @@ test('number-type', t => {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, minimum: { value: false, foo: 'bar' }})
+		validateFormat({ ...format, minimum: { value: false, foo: 'bar' }})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['minimum'])
 	t.is(error.message, "'foo' property is unexpected")
 
 	// test 'maximum' property
-	validateSpecs({ ...specs, maximum: 42 })
-	validateSpecs({ ...specs, maximum: { value: 42 }})
-	validateSpecs({ ...specs, maximum: { exclusive: false, value: 42 }})
-	validateSpecs({ ...specs, maximum: { exclusive: true, value: 42 }})
+	validateFormat({ ...format, maximum: 42 })
+	validateFormat({ ...format, maximum: { value: 42 }})
+	validateFormat({ ...format, maximum: { exclusive: false, value: 42 }})
+	validateFormat({ ...format, maximum: { exclusive: true, value: 42 }})
 
 	for (const invalidValue of [false, true, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, maximum: invalidValue })
+			validateFormat({ ...format, maximum: invalidValue })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['maximum'])
@@ -308,7 +308,7 @@ test('number-type', t => {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, maximum: { exclusive: false}})
+		validateFormat({ ...format, maximum: { exclusive: false}})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['maximum'])
@@ -316,7 +316,7 @@ test('number-type', t => {
 
 	for (const invalidValue of [42, 42.5, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, maximum: { exclusive: invalidValue, value: 42 }})
+			validateFormat({ ...format, maximum: { exclusive: invalidValue, value: 42 }})
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['maximum', 'exclusive'])
@@ -325,7 +325,7 @@ test('number-type', t => {
 
 	for (const invalidValue of [false, true, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, maximum: { exclusive: false, value: invalidValue }})
+			validateFormat({ ...format, maximum: { exclusive: false, value: invalidValue }})
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['maximum', 'value'])
@@ -333,7 +333,7 @@ test('number-type', t => {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ ...specs, maximum: { value: false, foo: 'bar' }})
+		validateFormat({ ...format, maximum: { value: false, foo: 'bar' }})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['maximum'])
@@ -342,7 +342,7 @@ test('number-type', t => {
 	// test minimum must be lower than maximum
 	for (const [minimum, maximum] of [[42, 0], [-9, -10], [1, -1]]) {
 		var error = t.throws(() => {
-			validateSpecs({ ...specs, minimum, maximum })
+			validateFormat({ ...format, minimum, maximum })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, [])
@@ -350,13 +350,13 @@ test('number-type', t => {
 	}
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'number',
 		decimal: 'foo',
 		minimum: false,
@@ -366,7 +366,7 @@ test('number-type', t => {
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -381,29 +381,29 @@ test('number-type', t => {
 })
 
 test('string-type', t => {
-	// test minimal specs
-	var specs = { type: 'string' }
-	validateSpecs(specs)
+	// test minimal format
+	var format = { type: 'string' }
+	validateFormat(format)
 
 	// test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test the 'length' property
-	lengthPropertyTest(t, specs)
+	lengthPropertyTest(t, format)
 
 	// test the 'pattern' property
-	validateSpecs({ ...specs, pattern: "^[a-z]+(-[a-z]+)*$"})
-	stringValuePropertyTest(t, specs, 'pattern', [])
+	validateFormat({ ...format, pattern: "^[a-z]+(-[a-z]+)*$"})
+	stringValuePropertyTest(t, format, 'pattern', [])
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'string',
 		length: false,
 		pattern: 42,
@@ -412,7 +412,7 @@ test('string-type', t => {
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -425,8 +425,8 @@ test('string-type', t => {
 })
 
 test('array-type', t => {
-	// test minimal specs
-	var specs = {
+	// test minimal format
+	var format = {
 		type: 'array',
 		value: {
 			type: 'string'
@@ -435,30 +435,30 @@ test('array-type', t => {
 
 	missingPropertyTest(t, { type: 'array' }, 'value')
 
-	validateSpecs({ type: 'array', value: { type: 'flag' }})
-	validateSpecs({ type: 'array', value: { type: 'number' }})
-	validateSpecs(specs)
+	validateFormat({ type: 'array', value: { type: 'flag' }})
+	validateFormat({ type: 'array', value: { type: 'number' }})
+	validateFormat(format)
 
 	// test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test the 'value' property
 	var error = t.throws(() => {
-		validateSpecs({ type: 'array', value: { type: 'foo' } })
+		validateFormat({ type: 'array', value: { type: 'foo' } })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['[]'])
 	t.is(error.message, "value of 'type' is incorrect")
 
 	// test the 'length' property
-	lengthPropertyTest(t, specs)
+	lengthPropertyTest(t, format)
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test nested arrays
 	const nestedArrays = {
@@ -471,10 +471,10 @@ test('array-type', t => {
 			}
 		}
 	}
-	validateSpecs(nestedArrays)
+	validateFormat(nestedArrays)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'array',
         value: 42,
 		length: false,
@@ -483,7 +483,7 @@ test('array-type', t => {
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -496,30 +496,30 @@ test('array-type', t => {
 })
 
 test('object-type', t => {
-	// test minimal specs
-	var specs = {
+	// test minimal format
+	var format = {
 		type: 'object',
 		key: 'string',
 		value: {
 			type: 'string'
 		}
 	}
-	validateSpecs(specs)
+	validateFormat(format)
 
 	missingPropertyTest(t, {type: 'object', value: { type: 'string'}}, 'key')
 	missingPropertyTest(t, {type: 'object', key: 'string'}, 'value')
 
 	// test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test the 'key' property
 	for (const key of ['integer', 'string']) {
-		validateSpecs({ type: 'object', key: key, value: { type: 'string' } })
+		validateFormat({ type: 'object', key: key, value: { type: 'string' } })
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ type: 'object', key: 'foo', value: { type: 'string' } })
+		validateFormat({ type: 'object', key: 'foo', value: { type: 'string' } })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -527,20 +527,20 @@ test('object-type', t => {
 
 	// test the 'value' property
 	var error = t.throws(() => {
-		validateSpecs({ type: 'object', value: { type: 'foo' } })
+		validateFormat({ type: 'object', value: { type: 'foo' } })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['{}'])
 	t.is(error.message, "value of 'type' is incorrect")
 
 	// test the 'length' property
-	lengthPropertyTest(t, specs)
+	lengthPropertyTest(t, format)
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test nested objects
 	const nestedObjects = {
@@ -554,10 +554,10 @@ test('object-type', t => {
 			}
 		}
 	}
-	validateSpecs(nestedObjects)
+	validateFormat(nestedObjects)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'object',
 		key: 'foo',
         value: 42,
@@ -567,7 +567,7 @@ test('object-type', t => {
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -582,8 +582,8 @@ test('object-type', t => {
 })
 
 test('tuple-type', t => {
-	// test minimal specs
-	var specs = {
+	// test minimal format
+	var format = {
 		type: 'tuple',
 		items: [
 			{ type: 'flag' },
@@ -591,17 +591,17 @@ test('tuple-type', t => {
 			{ type: 'string' }
 		]
 	}
-	validateSpecs(specs)
+	validateFormat(format)
 	missingPropertyTest(t, { type: 'tuple'}, 'items')
 
 	// test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test the 'items' property
 	for (const value in [false, true, 42, 42.5, "Hello world!"]) {
 		const error = t.throws(() => {
-			validateSpecs({ type: 'tuple', items: value })
+			validateFormat({ type: 'tuple', items: value })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['items'])
@@ -609,7 +609,7 @@ test('tuple-type', t => {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ type: 'tuple', items: [] })
+		validateFormat({ type: 'tuple', items: [] })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['items'])
@@ -617,7 +617,7 @@ test('tuple-type', t => {
 
 	for (const value in [false, true, 42, 42.5, "Hello world!"]) {
 		const error = t.throws(() => {
-			validateSpecs({ type: 'tuple', items: [value] })
+			validateFormat({ type: 'tuple', items: [value] })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['<0>'])
@@ -625,17 +625,17 @@ test('tuple-type', t => {
 	}
 
 	error = t.throws(() => {
-		validateSpecs({ type: 'tuple', items: [{ type: 'foo' }] })
+		validateFormat({ type: 'tuple', items: [{ type: 'foo' }] })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['<0>'])
 	t.is(error.message, "value of 'type' is incorrect")
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test nested tuples
 	const nestedTuples = {
@@ -652,10 +652,10 @@ test('tuple-type', t => {
 			}
 		]
 	}
-	validateSpecs(nestedTuples)
+	validateFormat(nestedTuples)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'tuple',
         items: [
 			{ type: 'foo' },
@@ -667,7 +667,7 @@ test('tuple-type', t => {
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -682,8 +682,8 @@ test('tuple-type', t => {
 })
 
 test('map-type', t => {
-	// test minimal specs
-	var specs = {
+	// test minimal format
+	var format = {
 		type: 'map',
 		fields: {
 			foo: { type: 'flag' },
@@ -691,17 +691,17 @@ test('map-type', t => {
 			quz: { type: 'string' }
 		}
 	}
-	validateSpecs(specs)
+	validateFormat(format)
 	missingPropertyTest(t, { type: 'map'}, 'fields')
 
 	// test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test the 'fields' property
 	for (const value in [false, true, 42, 42.5, "Hello world!"]) {
 		const error = t.throws(() => {
-			validateSpecs({ type: 'map', fields: value })
+			validateFormat({ type: 'map', fields: value })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['fields'])
@@ -709,14 +709,14 @@ test('map-type', t => {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({ type: 'map', fields: {} })
+		validateFormat({ type: 'map', fields: {} })
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['fields'])
 	t.is(error.message, "must contain at least one field")
 
 	for (const name of VALID_NAMES) {
-		const specs = {
+		const format = {
 			type: 'map',
 			fields: {
 				[name]: {
@@ -724,11 +724,11 @@ test('map-type', t => {
 				}
 			}
 		}
-		validateSpecs(specs)
+		validateFormat(format)
 	}
 
 	for (const name of INVALID_NAMES) {
-		const specs = {
+		const format = {
 			type: 'map',
 			fields: {
 				[name]: {
@@ -738,7 +738,7 @@ test('map-type', t => {
 		}
 
 		const error = t.throws(() => {
-			validateSpecs(specs)
+			validateFormat(format)
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['fields'])
@@ -747,7 +747,7 @@ test('map-type', t => {
 
 	for (const value in [false, true, 42, 42.5, "Hello world!"]) {
 		const error = t.throws(() => {
-			validateSpecs({ type: 'map', fields: { foo: value } })
+			validateFormat({ type: 'map', fields: { foo: value } })
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['$foo'])
@@ -755,17 +755,17 @@ test('map-type', t => {
 	}
 
 	error = t.throws(() => {
-		validateSpecs({ type: 'map', fields: { foo: { type: 'bar' } }})
+		validateFormat({ type: 'map', fields: { foo: { type: 'bar' } }})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['$foo'])
 	t.is(error.message, "value of 'type' is incorrect")
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test  nested maps
 	const nestedMaps = {
@@ -784,10 +784,10 @@ test('map-type', t => {
 			}
 		}
 	}
-	validateSpecs(nestedMaps)
+	validateFormat(nestedMaps)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'map',
         fields: {
 			'@foo': { type: 'flag' },
@@ -798,7 +798,7 @@ test('map-type', t => {
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")
@@ -811,15 +811,15 @@ test('map-type', t => {
 })
 
 test('enum-type', t => {
-	// test minimal specs
-	var specs = {
+	// test minimal format
+	var format = {
 		type: 'enum',
 		values: ['foo', 'bar', 'quz']
 	}
-	validateSpecs(specs)
+	validateFormat(format)
 
 	var error = t.throws(() => {
-		validateSpecs({type: 'enum'})
+		validateFormat({type: 'enum'})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, [])
@@ -828,7 +828,7 @@ test('enum-type', t => {
 	// test the 'values' property
 	for (const value in [true, false, 42, 42.5, "Hello world!"]) {
 		var error = t.throws(() => {
-			validateSpecs({type: 'enum', values: value})
+			validateFormat({type: 'enum', values: value})
 		}, {instanceOf: ValidationError})
 
 		t.deepEqual(error.path, ['values'])
@@ -836,38 +836,38 @@ test('enum-type', t => {
 	}
 
 	var error = t.throws(() => {
-		validateSpecs({type: 'enum', values: []})
+		validateFormat({type: 'enum', values: []})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['values'])
 	t.is(error.message, "must contain at least one value")
 
 	var error = t.throws(() => {
-		validateSpecs({type: 'enum', values: ['@foo', 'bar', 'quz']})
+		validateFormat({type: 'enum', values: ['@foo', 'bar', 'quz']})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['values'])
 	t.is(error.message, "'@foo' is an incorrect value")
 
 	var error = t.throws(() => {
-		validateSpecs({type: 'enum', values: ['foo', 'bar', 'quz', 'foo']})
+		validateFormat({type: 'enum', values: ['foo', 'bar', 'quz', 'foo']})
 	}, {instanceOf: ValidationError})
 
 	t.deepEqual(error.path, ['values'])
 	t.is(error.message, "'foo' value is duplicated")
 
 	// test the 'option' property
-	optionPropertyTest(t, specs, [])
+	optionPropertyTest(t, format, [])
 
 	// test additional properties
-	additionalPropertiesTest(t, specs)
+	additionalPropertiesTest(t, format)
 
 	// test 'name' and 'description' properties
-	namePropertyTest(t, specs)
-	descriptionPropertyTest(t, specs)
+	namePropertyTest(t, format)
+	descriptionPropertyTest(t, format)
 
 	// test lazy validation
-	var specs = {
+	var format = {
 		type: 'enum',
         values: ['@foo', 'bar', 'quz', 'bar'],
         option: 42,
@@ -875,7 +875,7 @@ test('enum-type', t => {
 	}
 
 	var errors = []
-	validateSpecs(specs, errors)
+	validateFormat(format, errors)
 
 	t.deepEqual(errors[0].path, [])
 	t.is(errors[0].message, "'foo' property is unexpected")

@@ -15,13 +15,13 @@
  * @copyright 2022
  */
 
-import validateSpecs from "./specs.js"
+import validateFormat from "./format.js"
 import documentToObject from "./document.js"
 import objectToDocument from "./object.js"
 import { ValidationError, ValidationWarning } from "./exceptions.js"
 
 export {
-    validateSpecs,
+    validateFormat,
     documentToObject,
     objectToDocument,
     ValidationError,

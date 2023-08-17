@@ -392,7 +392,7 @@ function validateBlock(path, block, errors, warnings) {
 }
 
 /*
-- specs  must be in the object form, use a yaml lib to read the raw string
+- format  must be in the object form, use a yaml lib to read the raw string
 
 */
 
@@ -400,11 +400,11 @@ function validateBlock(path, block, errors, warnings) {
  * To be written.
  *
  * @memberof Document
- * @param {object} specs - To be written.
+ * @param {object} format - To be written.
  * @param {array} errors - To be written.
  * @param {array} warnings - To be written.
  */
-function validateSpecs(specs, errors, warnings) {
+function validateFormat(format, errors, warnings) {
     // If errors and warnings parameters are set, they must be empty array.
     assert(
         errors === undefined || (errors.constructor === Array && errors.length == 0),
@@ -429,13 +429,13 @@ function validateSpecs(specs, errors, warnings) {
         warnings = []
     }
 
-    validateBlock([], specs, errors, warnings)
+    validateBlock([], format, errors, warnings)
 
-    // If we're not lazy-validating the specs, we raise the first error that
+    // If we're not lazy-validating the format, we raise the first error that
     // occurred, if any.
     if (!lazyValidation && errors.length > 0) {
         throw errors[0]
     }
 }
 
-export default validateSpecs
+export default validateFormat

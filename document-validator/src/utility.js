@@ -9,35 +9,35 @@
 
 import { ValidationError } from './exceptions.js'
 
-function readMinimumValue(specs) {
-    if (specs.minimum !== undefined) {
-        if (typeof specs.minimum === 'number') {
+function readMinimumValue(format) {
+    if (format.minimum !== undefined) {
+        if (typeof format.minimum === 'number') {
             return {
                 exclusive: false,
-                value: specs.minimum
+                value: format.minimum
             }
         }
         else {
             return {
-                exclusive: specs.minimum.exclusive || false,
-                value: specs.minimum.value
+                exclusive: format.minimum.exclusive || false,
+                value: format.minimum.value
             }
         }
     }
 }
 
-function readMaximumValue(specs) {
-    if (specs.maximum !== undefined) {
-        if (typeof specs.maximum === 'number') {
+function readMaximumValue(format) {
+    if (format.maximum !== undefined) {
+        if (typeof format.maximum === 'number') {
             return {
                 exclusive: false,
-                value: specs.maximum
+                value: format.maximum
             }
         }
         else {
             return {
-                exclusive: specs.maximum.exclusive || false,
-                value: specs.maximum.value
+                exclusive: format.maximum.exclusive || false,
+                value: format.maximum.value
             }
         }
     }
